@@ -18,9 +18,9 @@ public class LedSubsystem extends SubsystemBase {
   // local constants
   private static final int ADDRESS_STATUS = 0;
   private static final int ADDRESS_COLOR = 1;
-  private int ENABLED = 1;
+  private static int ENABLED = 1;
   private static final int SOLID_MODE = 0;
-  private static final int FLASHING_MODE = 30;
+  private static final int FLASHING_MODE = 20;
 
   // color constants
   public static final class Color {
@@ -32,7 +32,7 @@ public class LedSubsystem extends SubsystemBase {
 
   public LedSubsystem() {
     arduino = new I2C(I2C.Port.kOnboard, 0x08);
-    // arduino.write(ENABLED, 0);
+    arduino.write(1, 1);
     setAllianceColor();
     mode = SOLID_MODE;
     setColor(allianceColor);
@@ -52,12 +52,17 @@ public class LedSubsystem extends SubsystemBase {
   }
 
   public void setEnabled(int enabled) {
-    ENABLED = enabled;
+    // ENABLED = enabled;
     System.out.println(enabled);
-    // arduino.write(1, currentColor + mode);
-    setAllianceColor();
-    // setColor(currentColor);
     arduino.write(ENABLED, currentColor + mode);
+    if (enabled == 1) {
+      setAllianceColor();
+      resetColor();
+    }
+    else {
+      arduino.write(1, 1);
+    }
+    // setColor(currentColor);
   }
 
   public void setFlashing(boolean flash) {
@@ -66,16 +71,19 @@ public class LedSubsystem extends SubsystemBase {
     } else {
       mode = SOLID_MODE;
     }
-    // arduino.write(ENABLED, currentColor + mode);
+    //arduino.write(ENABLED, currentColor + mode);
   }
 
   public void setColor(int color) {
     currentColor = color;
-    arduino.write(1, color + mode);
+    System.out.print(ENABLED);
+    System.out.println("called setcolor");
+    arduino.write(ENABLED, color + mode);
   }
 
   public void resetColor() {
     setColor(allianceColor);
+    setFlashing(false);
   }
 
 }

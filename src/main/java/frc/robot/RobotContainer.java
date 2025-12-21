@@ -11,6 +11,7 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.commands.FlywheelSetSpeedCommand;
+import frc.robot.commands.LedColorCommand;
 import frc.robot.commands.LedEnableCommand;
 import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.subsystems.LedSubsystem;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -64,6 +66,14 @@ public class RobotContainer {
     m_flywheelSubsystem.setDefaultCommand(new FlywheelSetSpeedCommand(m_flywheelSubsystem, () -> m_driverController.getY(), () -> m_driverController.getX()));
     enableTrigger.whileTrue(new LedEnableCommand(m_ledSubsystem, 1).ignoringDisable(true));
     disableTrigger.whileTrue(new LedEnableCommand(m_ledSubsystem, 0).ignoringDisable(true));
+    new JoystickButton(m_driverController, 9).onTrue(new LedEnableCommand(m_ledSubsystem, 0).ignoringDisable(true));
+    new JoystickButton(m_driverController, 10).onTrue(new LedEnableCommand(m_ledSubsystem, 1).ignoringDisable(true));
+    new JoystickButton(m_driverController, 1).onTrue(new LedColorCommand(m_ledSubsystem,true, 2,false));
+    new JoystickButton(m_driverController, 2).onTrue(new LedColorCommand(m_ledSubsystem,true, 3,false));
+    new JoystickButton(m_driverController, 3).onTrue(new LedColorCommand(m_ledSubsystem,true, 4,false));
+    new JoystickButton(m_driverController, 4).onTrue(new LedColorCommand(m_ledSubsystem,true, 5,false));
+    new JoystickButton(m_driverController, 5).onTrue(new LedColorCommand(m_ledSubsystem,false, 6,false));
+    new JoystickButton(m_driverController, 6).onTrue(new LedColorCommand(m_ledSubsystem,false, 6,true));
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
