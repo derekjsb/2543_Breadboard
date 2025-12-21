@@ -63,17 +63,19 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     new Trigger(m_exampleSubsystem::exampleCondition)
         .onTrue(new ExampleCommand(m_exampleSubsystem));
-    m_flywheelSubsystem.setDefaultCommand(new FlywheelSetSpeedCommand(m_flywheelSubsystem, () -> m_driverController.getY(), () -> m_driverController.getX()));
+    m_flywheelSubsystem.setDefaultCommand(new FlywheelSetSpeedCommand(m_flywheelSubsystem, m_ledSubsystem, () -> m_driverController.getY(), () -> m_driverController.getX()));
     enableTrigger.whileTrue(new LedEnableCommand(m_ledSubsystem, 1).ignoringDisable(true));
     disableTrigger.whileTrue(new LedEnableCommand(m_ledSubsystem, 0).ignoringDisable(true));
     new JoystickButton(m_driverController, 9).onTrue(new LedEnableCommand(m_ledSubsystem, 0).ignoringDisable(true));
     new JoystickButton(m_driverController, 10).onTrue(new LedEnableCommand(m_ledSubsystem, 1).ignoringDisable(true));
-    new JoystickButton(m_driverController, 1).onTrue(new LedColorCommand(m_ledSubsystem,true, 2,false));
-    new JoystickButton(m_driverController, 2).onTrue(new LedColorCommand(m_ledSubsystem,true, 3,false));
-    new JoystickButton(m_driverController, 3).onTrue(new LedColorCommand(m_ledSubsystem,true, 4,false));
-    new JoystickButton(m_driverController, 4).onTrue(new LedColorCommand(m_ledSubsystem,true, 5,false));
-    new JoystickButton(m_driverController, 5).onTrue(new LedColorCommand(m_ledSubsystem,false, 6,false));
-    new JoystickButton(m_driverController, 6).onTrue(new LedColorCommand(m_ledSubsystem,false, 6,true));
+    new JoystickButton(m_driverController, 1).onTrue(new LedColorCommand(m_ledSubsystem,1, 2,false));
+    new JoystickButton(m_driverController, 2).onTrue(new LedColorCommand(m_ledSubsystem,1, 3,false));
+    new JoystickButton(m_driverController, 3).onTrue(new LedColorCommand(m_ledSubsystem,1, 4,false));
+    new JoystickButton(m_driverController, 4).onTrue(new LedColorCommand(m_ledSubsystem,1, 5,false));
+    new JoystickButton(m_driverController, 5).onTrue(new LedColorCommand(m_ledSubsystem,2, 6,false));
+    new JoystickButton(m_driverController, 6).onTrue(new LedColorCommand(m_ledSubsystem,2, 6,true));
+    new JoystickButton(m_driverController, 7).onTrue(new LedColorCommand(m_ledSubsystem,3, 6,false));
+    new JoystickButton(m_driverController, 8).onTrue(new LedColorCommand(m_ledSubsystem,3, 6,true));
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.

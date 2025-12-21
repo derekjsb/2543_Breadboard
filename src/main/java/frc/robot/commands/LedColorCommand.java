@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 public class LedColorCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final LedSubsystem m_subsystem;
-  private boolean currentMode;
+  private int currentMode;
   private int state;
   private boolean flash;
 
@@ -22,7 +22,7 @@ public class LedColorCommand extends Command {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public LedColorCommand(LedSubsystem subsystem, boolean mode, int color, boolean flashing) {
+  public LedColorCommand(LedSubsystem subsystem, int mode, int color, boolean flashing) {
     m_subsystem = subsystem;
     currentMode = mode;
     state = color;
@@ -34,13 +34,17 @@ public class LedColorCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (currentMode) {
+    if (currentMode == 1) {
     m_subsystem.setColor(state);
     System.out.println(state);
     }
-    else {
-    m_subsystem.setFlashing(flash);
+    else if (currentMode == 2) {
+    m_subsystem.setFlashing(flash,true);
     System.out.println(flash);
+    }
+    else {
+      m_subsystem.modifyColor(flash);
+      System.out.println(flash);
     }
   }
   // Called every time the scheduler runs while the command is scheduled.
@@ -54,6 +58,6 @@ public class LedColorCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

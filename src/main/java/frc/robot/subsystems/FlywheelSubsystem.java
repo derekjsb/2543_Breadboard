@@ -5,19 +5,37 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
+
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import frc.robot.subsystems.LedSubsystem;
+import frc.robot.commands.LedColorCommand;
 
 public class FlywheelSubsystem extends SubsystemBase {
   private TalonFX flywheel;
   private TorqueCurrentFOC torquecurrent;
   private double torqueOutput;
+  private double flywheelSpeed;
+  private LedSubsystem ledSub;
+  private int ledDebounce;
+
   /** Creates a new ExampleSubsystem. */
   public FlywheelSubsystem() {
     flywheel = new TalonFX(25);
+    setConfiguration();
   }
 
   /**
@@ -42,7 +60,32 @@ public class FlywheelSubsystem extends SubsystemBase {
     // System.out.println(speed);
   }
   public void setConfiguration() {
+   var currentLimitConfig = new CurrentLimitsConfigs()
+      .withStatorCurrentLimitEnable(true)
+      .withStatorCurrentLimit(30)
+      .withSupplyCurrentLimitEnable(true)
+      .withSupplyCurrentLimit(30);
 
+    var motorOutputConfig = new MotorOutputConfigs()
+      .withInverted(InvertedValue.CounterClockwise_Positive)
+      .withNeutralMode(NeutralModeValue.Coast);
+    
+    var slot0Config = new Slot0Configs()
+      .withGravityType(GravityTypeValue.Elevator_Static)
+      .withKA(0)
+      .withKG(0.0)
+      .withKP(0.0)
+      .withKI(0.0)
+      .withKS(0.0)
+      .withKV(0.0)
+      .withKD(0.0);
+
+    var talonFXConfig = new TalonFXConfiguration()
+      .withMotorOutput(motorOutputConfig)
+      .withSlot0(slot0Config)
+      .withCurrentLimits(currentLimitConfig);
+
+    flywheel.getConfigurator().apply(talonFXConfig);
   }
   public boolean exampleCondition() {
     // Query some boolean state, such as a digital sensor.

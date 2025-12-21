@@ -5,8 +5,11 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.FlywheelSubsystem;
+import frc.robot.subsystems.LedSubsystem;
 
 import java.util.function.DoubleSupplier;
+
+import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -14,16 +17,21 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class FlywheelSetSpeedCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final FlywheelSubsystem m_subsystem;
+  private final LedSubsystem m_ledSubsystem;
   private DoubleSupplier speed;
   private DoubleSupplier torque;
+  private TalonFX flywheel;
+  private double flywheelTorqueCurrent;
+  private int ledDebounce;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public FlywheelSetSpeedCommand(FlywheelSubsystem subsystem, DoubleSupplier setSpeed, DoubleSupplier setTorque) {
+  public FlywheelSetSpeedCommand(FlywheelSubsystem subsystem, LedSubsystem ledSubsystem, DoubleSupplier setSpeed, DoubleSupplier setTorque) {
     m_subsystem = subsystem;
+    m_ledSubsystem = ledSubsystem;
     speed = setSpeed;
     torque = setTorque;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -39,6 +47,45 @@ public class FlywheelSetSpeedCommand extends Command {
   @Override
   public void execute() {
   m_subsystem.setSpeed(speed.getAsDouble(),torque.getAsDouble());
+  flywheel = new TalonFX(25);
+  var torqueCurrentSignal = flywheel.getTorqueCurrent();
+    flywheelTorqueCurrent = Math.abs(torqueCurrentSignal.getValueAsDouble());
+
+    if (flywheelTorqueCurrent < 1) {
+      if (ledDebounce != 0) {
+        m_ledSubsystem.resetColor();
+        System.out.print("reset");
+        System.out.println(flywheelTorqueCurrent);
+        ledDebounce = 0;
+      }
+    }
+    else if (flywheelTorqueCurrent < 8) {
+      if (ledDebounce != 1) {
+        m_ledSubsystem.setFlashing(false, false);
+        m_ledSubsystem.setColor(4); // green
+        System.out.print("green");
+        System.out.println(flywheelTorqueCurrent);
+      }
+    ledDebounce = 1;
+    }
+    else if (flywheelTorqueCurrent < 12) {
+      if (ledDebounce != 2) {
+        m_ledSubsystem.setFlashing(true, false);
+        m_ledSubsystem.setColor(3); // yellow
+        System.out.print("yellow");
+        System.out.println(flywheelTorqueCurrent);
+      ledDebounce = 2;
+      }
+      }
+    else if (flywheelTorqueCurrent < 16) {
+      if (ledDebounce != 3) {
+        m_ledSubsystem.setFlashing(true, false);
+        m_ledSubsystem.setColor(1); // red
+        System.out.print("red");
+        System.out.println(flywheelTorqueCurrent);
+        ledDebounce = 3;
+      }
+      } 
   }
   // Called once the command ends or is interrupted.
   @Override
