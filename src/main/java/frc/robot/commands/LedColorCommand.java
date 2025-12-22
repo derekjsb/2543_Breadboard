@@ -36,15 +36,15 @@ public class LedColorCommand extends Command {
   public void initialize() {
     if (currentMode == 1) {
     m_subsystem.setColor(state);
-    System.out.println(state);
+    //remove for debug System.out.println(state);
     }
     else if (currentMode == 2) {
     m_subsystem.setFlashing(flash,true);
-    System.out.println(flash);
+    //remove for debug System.out.println(flash);
     }
     else {
       m_subsystem.modifyColor(flash);
-      System.out.println(flash);
+      //remove for debug System.out.println(flash);
     }
   }
   // Called every time the scheduler runs while the command is scheduled.

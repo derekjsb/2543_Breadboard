@@ -20,6 +20,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.Preferences;
 
 import frc.robot.subsystems.LedSubsystem;
 import frc.robot.commands.LedColorCommand;
@@ -28,14 +29,19 @@ public class FlywheelSubsystem extends SubsystemBase {
   private TalonFX flywheel;
   private TorqueCurrentFOC torquecurrent;
   private double torqueOutput;
+  public double fwDeadband;
+  public double fwMaxTorque;
   private double flywheelSpeed;
   private LedSubsystem ledSub;
   private int ledDebounce;
 
   /** Creates a new ExampleSubsystem. */
   public FlywheelSubsystem() {
+    Preferences.initDouble(Constants.flywheelDeadbandKey, 0.05);
+    Preferences.initDouble(Constants.maxTorqueKey, 20);
     flywheel = new TalonFX(25);
     setConfiguration();
+    loadPreferences();
   }
 
   /**
@@ -44,11 +50,11 @@ public class FlywheelSubsystem extends SubsystemBase {
    * @return value of some boolean subsystem state, such as a digital sensor.
    */
   public void setSpeed(double speed, double torque) {
-    if (speed < -Constants.flywheelDeadband) {
-      torqueOutput = Math.abs(torque)*20;
+    if (speed < -fwDeadband) {
+      torqueOutput = Math.abs(torque)*fwMaxTorque;
     }
-    else if (speed >= Constants.flywheelDeadband) {
-      torqueOutput = -Math.abs(torque)*20;
+    else if (speed >= fwDeadband) {
+      torqueOutput = -Math.abs(torque)*fwMaxTorque;
     }
     else {
       torqueOutput = 0;
@@ -86,6 +92,11 @@ public class FlywheelSubsystem extends SubsystemBase {
       .withCurrentLimits(currentLimitConfig);
 
     flywheel.getConfigurator().apply(talonFXConfig);
+  }
+
+  public void loadPreferences() {
+    fwDeadband = Preferences.getDouble(Constants.flywheelDeadbandKey, Constants.flywheelDeadbandDefaultValue);
+    fwMaxTorque = Preferences.getDouble(Constants.maxTorqueKey, Constants.torqueDefaultValue);
   }
   public boolean exampleCondition() {
     // Query some boolean state, such as a digital sensor.

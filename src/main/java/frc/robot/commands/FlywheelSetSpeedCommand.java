@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import frc.robot.Constants;
 import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.subsystems.LedSubsystem;
 
@@ -11,6 +12,7 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
@@ -42,6 +44,12 @@ public class FlywheelSetSpeedCommand extends Command {
   @Override
   public void initialize() {
   // m_subsystem.setSpeed(speed.getAsDouble());
+  if (m_subsystem.fwDeadband != Preferences.getDouble(Constants.flywheelDeadbandKey, Constants.flywheelDeadbandDefaultValue) 
+  && m_subsystem.fwMaxTorque != Preferences.getDouble(Constants.maxTorqueKey, Constants.torqueDefaultValue)) {
+    m_subsystem.fwDeadband = Preferences.getDouble(Constants.flywheelDeadbandKey, Constants.flywheelDeadbandDefaultValue);
+    m_subsystem.fwMaxTorque = Preferences.getDouble(Constants.maxTorqueKey, Constants.torqueDefaultValue);
+    System.out.println("initialized preference values");
+  }
   }
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -54,8 +62,8 @@ public class FlywheelSetSpeedCommand extends Command {
     if (flywheelTorqueCurrent < 1) {
       if (ledDebounce != 0) {
         m_ledSubsystem.resetColor();
-        System.out.print("reset");
-        System.out.println(flywheelTorqueCurrent);
+        //remove for debug System.out.print("reset");
+        //remove for debug System.out.println(flywheelTorqueCurrent);
         ledDebounce = 0;
       }
     }
@@ -63,8 +71,8 @@ public class FlywheelSetSpeedCommand extends Command {
       if (ledDebounce != 1) {
         m_ledSubsystem.setFlashing(false, false);
         m_ledSubsystem.setColor(4); // green
-        System.out.print("green");
-        System.out.println(flywheelTorqueCurrent);
+        //remove for debug System.out.print("green");
+        //remove for debug System.out.println(flywheelTorqueCurrent);
       }
     ledDebounce = 1;
     }
@@ -72,8 +80,8 @@ public class FlywheelSetSpeedCommand extends Command {
       if (ledDebounce != 2) {
         m_ledSubsystem.setFlashing(true, false);
         m_ledSubsystem.setColor(3); // yellow
-        System.out.print("yellow");
-        System.out.println(flywheelTorqueCurrent);
+        //remove for debug System.out.print("yellow");
+        //remove for debug System.out.println(flywheelTorqueCurrent);
       ledDebounce = 2;
       }
       }
@@ -81,8 +89,8 @@ public class FlywheelSetSpeedCommand extends Command {
       if (ledDebounce != 3) {
         m_ledSubsystem.setFlashing(true, false);
         m_ledSubsystem.setColor(1); // red
-        System.out.print("red");
-        System.out.println(flywheelTorqueCurrent);
+        //remove for debug System.out.print("red");
+        //remove for debug System.out.println(flywheelTorqueCurrent);
         ledDebounce = 3;
       }
       } 

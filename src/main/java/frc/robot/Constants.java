@@ -16,5 +16,10 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
-  public static final double flywheelDeadband = 0.05;
+  public static final String ledDefaultPatternKey = "LEDDefaultPattern";
+  public static final int ledPatternDefaultValue = 0;
+  public static final String flywheelDeadbandKey = "FOCFlywheelDeadband";
+  public static final double flywheelDeadbandDefaultValue = 0.05;
+  public static final String maxTorqueKey = "MaxFOCTorque";
+  public static final double torqueDefaultValue = 20.0;
 }

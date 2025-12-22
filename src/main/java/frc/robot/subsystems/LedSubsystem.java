@@ -5,8 +5,12 @@ import java.util.Random;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.util.Elastic;
 
 public class LedSubsystem extends SubsystemBase {
 
@@ -36,6 +40,8 @@ public class LedSubsystem extends SubsystemBase {
     setAllianceColor();
     mode = SOLID_MODE;
     // setColor(allianceColor);
+    Preferences.initInt(Constants.ledDefaultPatternKey, Constants.ledPatternDefaultValue);
+    pushDashboardValues();
   }
 
   
@@ -50,6 +56,12 @@ public class LedSubsystem extends SubsystemBase {
         }
     }
     System.out.println("alliance color: " + allianceColor);
+    if (Preferences.getInt(Constants.ledDefaultPatternKey, Constants.ledPatternDefaultValue) > 1) {
+      System.out.println("custom led");
+      allianceColor = Preferences.getInt(Constants.ledDefaultPatternKey, Constants.ledPatternDefaultValue);
+      currentColor = allianceColor;
+    }
+    pushDashboardValues();
   }
 
   public void setEnabled(int enabled) {
@@ -91,19 +103,28 @@ public class LedSubsystem extends SubsystemBase {
     }
     if (reset) {
     arduino.write(ENABLED, currentColor + mode);
+    pushDashboardValues();
     }
   }
 
   public void setColor(int color) {
     currentColor = color;
-    System.out.print(ENABLED);
-    System.out.println("called setcolor");
+    // System.out.print(ENABLED);
+    // System.out.println("called setcolor");
     arduino.write(ENABLED, color + mode);
+    pushDashboardValues();
   }
 
   public void resetColor() {
     setColor(allianceColor);
     setFlashing(false,true);
+  }
+
+  public void pushDashboardValues() {
+    SmartDashboard.putNumber("LightShow Current Color",currentColor);
+    SmartDashboard.putBoolean("LightShow Flashing", (mode == FLASHING_MODE));
+    Elastic.Notification dashboardNotification = new Elastic.Notification(Elastic.NotificationLevel.INFO, "Dashboard Values Updated", "LED Dashboard values have been updated.");
+    Elastic.sendNotification(dashboardNotification);
   }
 
 }
