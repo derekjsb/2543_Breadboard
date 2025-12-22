@@ -5,8 +5,10 @@
 package frc.robot;
 
 import edu.wpi.first.net.WebServer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -50,6 +52,14 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+    double matchTime = DriverStation.getMatchTime();
+    System.out.println(matchTime);
+    if (matchTime > -1) {
+    SmartDashboard.putNumber("Match Time", matchTime);
+    }
+    else {
+      SmartDashboard.putNumber("Match Time", 0);
+    }
   }
 
   @Override
@@ -68,7 +78,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+  }
 
   @Override
   public void teleopInit() {
@@ -83,7 +95,13 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    double matchTime = DriverStation.getMatchTime();
+    SmartDashboard.putNumber("Match Time", matchTime);
+    if (matchTime <= Constants.endgameSeconds) {
+
+    }
+  }
 
   @Override
   public void testInit() {

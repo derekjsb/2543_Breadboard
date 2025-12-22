@@ -8,15 +8,43 @@
         "layouts": [
           {
             "title": "SmartDashboard",
-            "x": 768.0,
-            "y": 128.0,
+            "x": 512.0,
+            "y": 0.0,
             "width": 256.0,
-            "height": 256.0,
+            "height": 384.0,
             "type": "List Layout",
             "properties": {
               "label_position": "TOP"
             },
             "children": [
+              {
+                "title": "Flywheel Torque Current",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Flywheel Torque Current",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Flywheel Velocity",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Flywheel Velocity",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
               {
                 "title": "LightShow Current Color",
                 "x": 0.0,
@@ -53,21 +81,9 @@
         ],
         "containers": [
           {
-            "title": "Preferences",
-            "x": 512.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 384.0,
-            "type": "RobotPreferences",
-            "properties": {
-              "topic": "/Preferences",
-              "period": 0.06
-            }
-          },
-          {
             "title": "LEDDefaultPattern",
-            "x": 1024.0,
-            "y": 0.0,
+            "x": 384.0,
+            "y": 128.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
@@ -79,17 +95,109 @@
             }
           },
           {
-            "title": "Auto",
-            "x": 768.0,
+            "title": "MaxFOCTorque",
+            "x": 384.0,
             "y": 0.0,
-            "width": 256.0,
+            "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/Preferences/Auto",
+              "topic": "/Preferences/MaxFOCTorque",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": true
+            }
+          },
+          {
+            "title": "Flywheel Velocity",
+            "x": 0.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/Flywheel Velocity",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -140.0,
+              "end_angle": 140.0,
+              "min_value": 0.0,
+              "max_value": 120.0,
+              "number_of_labels": 8,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
+            }
+          },
+          {
+            "title": "Auto",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/SmartDashboard/Auto",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Preferences",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "RobotPreferences",
+            "properties": {
+              "topic": "/Preferences",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "FMSInfo",
+            "x": 256.0,
+            "y": 384.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "FMSInfo",
+            "properties": {
+              "topic": "/FMSInfo",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Match Time",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Match Time",
+            "properties": {
+              "topic": "/SmartDashboard/Match Time",
+              "period": 0.06,
+              "data_type": "double",
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 30,
+              "yellow_start_time": 35
+            }
+          },
+          {
+            "title": "Flywheel Torque Current",
+            "x": 256.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Number Bar",
+            "properties": {
+              "topic": "/SmartDashboard/Flywheel Torque Current",
+              "period": 0.06,
+              "data_type": "double",
+              "min_value": 0.0,
+              "max_value": 30.0,
+              "divisions": 5,
+              "inverted": false,
+              "orientation": "horizontal"
             }
           }
         ]

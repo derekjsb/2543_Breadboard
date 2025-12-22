@@ -43,6 +43,8 @@ public class RobotContainer {
   private final LedSubsystem m_ledSubsystem = new LedSubsystem();
   private final Trigger enableTrigger = new Trigger(DriverStation::isEnabled);
   private final Trigger disableTrigger = new Trigger(DriverStation::isDisabled);
+  private final Trigger preEndgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds + Constants.endgameWarning));
+  private final Trigger endgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds));
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   // private final CommandXboxController m_driverController =
@@ -69,8 +71,10 @@ public class RobotContainer {
     new Trigger(m_exampleSubsystem::exampleCondition)
         .onTrue(new ExampleCommand(m_exampleSubsystem));
     m_flywheelSubsystem.setDefaultCommand(new FlywheelSetSpeedCommand(m_flywheelSubsystem, m_ledSubsystem, () -> m_driverController.getY(), () -> m_driverController.getX()));
-    enableTrigger.whileTrue(new LedEnableCommand(m_ledSubsystem, 1).ignoringDisable(true));
+    enableTrigger.onTrue(new LedEnableCommand(m_ledSubsystem, 1).ignoringDisable(true));
     disableTrigger.whileTrue(new LedEnableCommand(m_ledSubsystem, 0).ignoringDisable(true));
+    preEndgameTrigger.onTrue(new LedEnableCommand(m_ledSubsystem, 2).ignoringDisable(true));
+    endgameTrigger.onTrue(new LedEnableCommand(m_ledSubsystem, 3).ignoringDisable(true));
     new JoystickButton(m_driverController, 9).onTrue(new LedEnableCommand(m_ledSubsystem, 0).ignoringDisable(true));
     new JoystickButton(m_driverController, 10).onTrue(new LedEnableCommand(m_ledSubsystem, 1).ignoringDisable(true));
     new JoystickButton(m_driverController, 1).onTrue(new LedColorCommand(m_ledSubsystem,1, 2,false));
@@ -82,7 +86,8 @@ public class RobotContainer {
     new JoystickButton(m_driverController, 7).onTrue(new LedColorCommand(m_ledSubsystem,3, 6,false));
     new JoystickButton(m_driverController, 8).onTrue(new LedColorCommand(m_ledSubsystem,3, 6,true));
 
-    Preferences.setInt("Auto",0);
+    Preferences.remove("Auto");
+    SmartDashboard.putBoolean("Auto",false);
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
     // m_driverController.ax.whileTrue(m_exampleSubsystem.exampleMethodCommand());
@@ -95,7 +100,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    if (Preferences.getInt("Auto", 0) == 1) {
+    if (SmartDashboard.getBoolean("Auto", false)) {
     return Autos.fwAuto(m_exampleSubsystem,m_flywheelSubsystem,m_ledSubsystem);
     }
     else {

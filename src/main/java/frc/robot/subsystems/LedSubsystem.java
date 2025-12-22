@@ -25,6 +25,8 @@ public class LedSubsystem extends SubsystemBase {
   private static int ENABLED = 1;
   private static final int SOLID_MODE = 0;
   private static final int FLASHING_MODE = 10;
+  private static final int PRE_ENDGAME_COLOR = 17;
+  private static final int ENDGAME_COLOR = 24;
 
   // color constants
   public static final class Color {
@@ -37,7 +39,7 @@ public class LedSubsystem extends SubsystemBase {
   public LedSubsystem() {
     arduino = new I2C(I2C.Port.kOnboard, 0x08);
     // arduino.write(1, 1);
-    setAllianceColor();
+    setAllianceColor(0);
     mode = SOLID_MODE;
     // setColor(allianceColor);
     Preferences.initInt(Constants.ledDefaultPatternKey, Constants.ledPatternDefaultValue);
@@ -45,7 +47,7 @@ public class LedSubsystem extends SubsystemBase {
   }
 
   
-  private void setAllianceColor() {
+  private void setAllianceColor(int endgame) {
     allianceColor = Color.BLUE;
     currentColor = Color.BLUE;
     Optional<Alliance> ally = DriverStation.getAlliance();
@@ -61,6 +63,14 @@ public class LedSubsystem extends SubsystemBase {
       allianceColor = Preferences.getInt(Constants.ledDefaultPatternKey, Constants.ledPatternDefaultValue);
       currentColor = allianceColor;
     }
+    if (endgame == 2) {
+      allianceColor = PRE_ENDGAME_COLOR;
+      currentColor = PRE_ENDGAME_COLOR;
+    }
+    else if (endgame == 3) {
+      allianceColor = ENDGAME_COLOR;
+      currentColor = ENDGAME_COLOR;
+    }
     pushDashboardValues();
   }
 
@@ -73,14 +83,7 @@ public class LedSubsystem extends SubsystemBase {
     else {
     arduino.write(0, 1);
     }
-    // arduino.write(ENABLED, currentColor + mode);
-    // if (enabled == 1) {
-      setAllianceColor();
-    //   resetColor();
-    // }
-    // else {
-    //   arduino.write(1, 1);
-    // }
+    setAllianceColor(enabled);
     setColor(currentColor);
     setFlashing(false, false);
   }
