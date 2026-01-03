@@ -19,7 +19,11 @@ public final class Autos {
     return Commands.sequence(subsystem.exampleMethodCommand(), new ExampleCommand(subsystem));
   }
   public static Command fwAuto(ExampleSubsystem subsystem, FlywheelSubsystem f_subsystem, LedSubsystem l_subsystem) {
-    return new FlywheelSetSpeedCommand(f_subsystem, l_subsystem, () -> 0.5, () -> 0.5);
+    // return new FlywheelSetSpeedCommand(f_subsystem, l_subsystem, () -> 0.5, () -> 0.5);
+    return Commands.sequence(new FlywheelSetSpeedCommand(f_subsystem, l_subsystem, () -> 0.5, () -> 0.5), 
+    new FlywheelSetSpeedCommand(f_subsystem, l_subsystem, () -> -0.25, () -> 1),
+    Commands.waitSeconds(2),
+    new FlywheelSetSpeedCommand(f_subsystem, l_subsystem, () -> 0.75, () -> 0.75));
   }
 
   private Autos() {

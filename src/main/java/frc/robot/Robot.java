@@ -54,17 +54,24 @@ public class Robot extends TimedRobot {
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     double matchTime = DriverStation.getMatchTime();
     System.out.println(matchTime);
-    if (matchTime > -1) {
-    SmartDashboard.putNumber("Match Time", matchTime);
-    }
-    else {
-      SmartDashboard.putNumber("Match Time", 0);
-    }
+    // if (matchTime > -1) {
+    // SmartDashboard.putNumber("Match Time", matchTime);
+    // }
+    // else {
+    //   SmartDashboard.putNumber("Match Time", Constants.disabledSeconds);
+    // }
   }
 
   @Override
-  public void disabledPeriodic() {}
-
+  public void disabledPeriodic() {
+    double matchTime = DriverStation.getMatchTime();
+    if (matchTime > -1) {
+      SmartDashboard.putNumber("Match Time", matchTime);
+      }
+      else {
+        SmartDashboard.putNumber("Match Time", Constants.disabledSeconds);
+     }
+  }
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
@@ -79,7 +86,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime() + 1);
   }
 
   @Override
@@ -97,10 +104,10 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     double matchTime = DriverStation.getMatchTime();
-    SmartDashboard.putNumber("Match Time", matchTime);
-    if (matchTime <= Constants.endgameSeconds) {
+    SmartDashboard.putNumber("Match Time", matchTime + 1);
+    // if (matchTime <= Constants.endgameSeconds) {
 
-    }
+    // }
   }
 
   @Override

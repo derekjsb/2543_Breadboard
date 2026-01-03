@@ -27,6 +27,7 @@ public class FlywheelSetSpeedCommand extends Command {
   private double flywheelTorqueCurrent;
   private double flywheelVelocity;
   private int ledDebounce;
+  private double dcMultiplier;
 
   /**
    * Creates a new ExampleCommand.
@@ -38,6 +39,7 @@ public class FlywheelSetSpeedCommand extends Command {
     m_ledSubsystem = ledSubsystem;
     speed = setSpeed;
     torque = setTorque;
+    dcMultiplier = 125;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
@@ -45,7 +47,7 @@ public class FlywheelSetSpeedCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-  // m_subsystem.setSpeed(speed.getAsDouble());
+  m_subsystem.loadPreferences();
   if (m_subsystem.fwDeadband != Preferences.getDouble(Constants.flywheelDeadbandKey, Constants.flywheelDeadbandDefaultValue) 
   || m_subsystem.fwMaxTorque != Preferences.getDouble(Constants.maxTorqueKey, Constants.torqueDefaultValue)) {
     m_subsystem.fwDeadband = Preferences.getDouble(Constants.flywheelDeadbandKey, Constants.flywheelDeadbandDefaultValue);
@@ -64,11 +66,17 @@ public class FlywheelSetSpeedCommand extends Command {
     flywheelVelocity = Math.abs(velocitySignal.getValueAsDouble());
     SmartDashboard.putNumber("Flywheel Torque Current", flywheelTorqueCurrent);
     SmartDashboard.putNumber("Flywheel Velocity", flywheelVelocity);
-    if (flywheelTorqueCurrent < 1) {
+    SmartDashboard.putNumber("Flywheel Distance From Target", Math.abs(Math.abs(flywheelVelocity - (Math.abs(speed.getAsDouble()) * dcMultiplier))));
+    if (Math.abs(flywheelVelocity - (Math.abs(speed.getAsDouble()) * dcMultiplier)) < 4 && Math.abs(speed.getAsDouble()) > Preferences.getDouble(Constants.flywheelDeadbandKey, 0.01)) {
+      if (ledDebounce != -1) {
+        m_ledSubsystem.setFlashing(false, false);
+        m_ledSubsystem.setColor(26); // rgb full
+        ledDebounce = -1;
+      }
+    }
+    else if (flywheelTorqueCurrent < 1) {
       if (ledDebounce != 0) {
         m_ledSubsystem.resetColor();
-        //remove for debug System.out.print("reset");
-        //remove for debug System.out.println(flywheelTorqueCurrent);
         ledDebounce = 0;
       }
     }
@@ -76,8 +84,6 @@ public class FlywheelSetSpeedCommand extends Command {
       if (ledDebounce != 1) {
         m_ledSubsystem.setFlashing(false, false);
         m_ledSubsystem.setColor(4); // green
-        //remove for debug System.out.print("green");
-        //remove for debug System.out.println(flywheelTorqueCurrent);
       }
     ledDebounce = 1;
     }
@@ -85,8 +91,6 @@ public class FlywheelSetSpeedCommand extends Command {
       if (ledDebounce != 2) {
         m_ledSubsystem.setFlashing(true, false);
         m_ledSubsystem.setColor(3); // yellow
-        //remove for debug System.out.print("yellow");
-        //remove for debug System.out.println(flywheelTorqueCurrent);
       ledDebounce = 2;
       }
       }
@@ -94,8 +98,6 @@ public class FlywheelSetSpeedCommand extends Command {
       if (ledDebounce != 3) {
         m_ledSubsystem.setFlashing(true, false);
         m_ledSubsystem.setColor(1); // red
-        //remove for debug System.out.print("red");
-        //remove for debug System.out.println(flywheelTorqueCurrent);
         ledDebounce = 3;
       }
       } 
@@ -107,6 +109,11 @@ public class FlywheelSetSpeedCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    if (Math.abs(flywheelVelocity - (Math.abs(speed.getAsDouble()) * dcMultiplier)) < 4 && Math.abs(speed.getAsDouble()) > Preferences.getDouble(Constants.flywheelDeadbandKey, 0.01)) {
+    return true;
+    }
+    else {
+      return false;
+    }
   }
 }

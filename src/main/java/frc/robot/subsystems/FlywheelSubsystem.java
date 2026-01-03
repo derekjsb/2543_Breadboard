@@ -12,6 +12,7 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -34,11 +35,13 @@ public class FlywheelSubsystem extends SubsystemBase {
   private double flywheelSpeed;
   private LedSubsystem ledSub;
   private int ledDebounce;
+  private boolean useTorqueCurrentFOC;
 
   /** Creates a new ExampleSubsystem. */
   public FlywheelSubsystem() {
     Preferences.initDouble(Constants.flywheelDeadbandKey, 0.05);
     Preferences.initDouble(Constants.maxTorqueKey, 20);
+    Preferences.initBoolean("Use TorqueCurrentFOC", true);
     flywheel = new TalonFX(25);
     setConfiguration();
     loadPreferences();
@@ -58,11 +61,20 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
     else {
       torqueOutput = 0;
+      speed = 0;
     }
 
+    // torque current
+    if (useTorqueCurrentFOC) {
     torquecurrent = new TorqueCurrentFOC(torqueOutput);
     flywheel.setControl(torquecurrent
     .withMaxAbsDutyCycle(Math.abs(speed)));
+    }
+    // duty cycle
+    else {
+    flywheel.setControl(new DutyCycleOut(-speed).withEnableFOC((torque > 0)));
+    }
+
     // System.out.println(speed);
   }
   public void setConfiguration() {
@@ -97,6 +109,7 @@ public class FlywheelSubsystem extends SubsystemBase {
   public void loadPreferences() {
     fwDeadband = Preferences.getDouble(Constants.flywheelDeadbandKey, Constants.flywheelDeadbandDefaultValue);
     fwMaxTorque = Preferences.getDouble(Constants.maxTorqueKey, Constants.torqueDefaultValue);
+    useTorqueCurrentFOC = Preferences.getBoolean("Use TorqueCurrentFOC", true);
   }
   public boolean exampleCondition() {
     // Query some boolean state, such as a digital sensor.

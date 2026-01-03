@@ -16,6 +16,7 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+  public static final double disabledSeconds = 135;
   public static final double endgameSeconds = 30;
   public static final double endgameWarning = 5;
   public static final String ledDefaultPatternKey = "LEDDefaultPattern";
