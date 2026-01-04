@@ -46,6 +46,20 @@
                 }
               },
               {
+                "title": "Flywheel Distance From Target",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Flywheel Distance From Target",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
                 "title": "LightShow Current Color",
                 "x": 0.0,
                 "y": 0.0,
@@ -56,7 +70,7 @@
                   "topic": "/SmartDashboard/LightShow Current Color",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -131,8 +145,8 @@
           },
           {
             "title": "Auto",
-            "x": 768.0,
-            "y": 256.0,
+            "x": 640.0,
+            "y": 384.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Toggle Switch",
@@ -198,6 +212,32 @@
               "divisions": 5,
               "inverted": false,
               "orientation": "horizontal"
+            }
+          },
+          {
+            "title": "Use tqFOC",
+            "x": 896.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/Preferences/Use TorqueCurrentFOC",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "Flywheel",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Toggle Button",
+            "properties": {
+              "topic": "/SmartDashboard/Flywheel Config Refresh",
+              "period": 0.06,
+              "data_type": "boolean"
             }
           }
         ]

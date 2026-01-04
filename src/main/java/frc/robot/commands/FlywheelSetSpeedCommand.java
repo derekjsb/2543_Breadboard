@@ -60,17 +60,19 @@ public class FlywheelSetSpeedCommand extends Command {
   public void execute() {
   m_subsystem.setSpeed(speed.getAsDouble(),torque.getAsDouble());
   flywheel = new TalonFX(25);
-    var torqueCurrentSignal = flywheel.getTorqueCurrent();
-    flywheelTorqueCurrent = Math.abs(torqueCurrentSignal.getValueAsDouble());
-    var velocitySignal = flywheel.getVelocity();
-    flywheelVelocity = Math.abs(velocitySignal.getValueAsDouble());
-    SmartDashboard.putNumber("Flywheel Torque Current", flywheelTorqueCurrent);
-    SmartDashboard.putNumber("Flywheel Velocity", flywheelVelocity);
+      // var torqueCurrentSignal = flywheel.getTorqueCurrent();
+      // flywheelTorqueCurrent = Math.abs(torqueCurrentSignal.getValueAsDouble());
+      // var velocitySignal = flywheel.getVelocity();
+      // flywheelVelocity = Math.abs(velocitySignal.getValueAsDouble());
+    // SmartDashboard.putNumber("Flywheel Torque Current", flywheelTorqueCurrent);
+    // SmartDashboard.putNumber("Flywheel Velocity", flywheelVelocity);
+    flywheelTorqueCurrent = m_subsystem.getTorqueCurrent();
+    flywheelVelocity = m_subsystem.getVelocity();
     SmartDashboard.putNumber("Flywheel Distance From Target", Math.abs(Math.abs(flywheelVelocity - (Math.abs(speed.getAsDouble()) * dcMultiplier))));
     if (Math.abs(flywheelVelocity - (Math.abs(speed.getAsDouble()) * dcMultiplier)) < 4 && Math.abs(speed.getAsDouble()) > Preferences.getDouble(Constants.flywheelDeadbandKey, 0.01)) {
       if (ledDebounce != -1) {
         m_ledSubsystem.setFlashing(false, false);
-        m_ledSubsystem.setColor(26); // rgb full
+        m_ledSubsystem.setColor(9); // purple
         ledDebounce = -1;
       }
     }

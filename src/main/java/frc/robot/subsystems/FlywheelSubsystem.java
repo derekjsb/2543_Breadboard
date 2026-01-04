@@ -22,7 +22,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.Preferences;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.LedSubsystem;
 import frc.robot.commands.LedColorCommand;
 
@@ -33,6 +33,8 @@ public class FlywheelSubsystem extends SubsystemBase {
   public double fwDeadband;
   public double fwMaxTorque;
   private double flywheelSpeed;
+  private double flywheelTorqueCurrent;
+  private double flywheelVelocity;
   private LedSubsystem ledSub;
   private int ledDebounce;
   private boolean useTorqueCurrentFOC;
@@ -104,6 +106,7 @@ public class FlywheelSubsystem extends SubsystemBase {
       .withCurrentLimits(currentLimitConfig);
 
     flywheel.getConfigurator().apply(talonFXConfig);
+    SmartDashboard.putBoolean("Flywheel Config Refresh", false);
   }
 
   public void loadPreferences() {
@@ -111,6 +114,14 @@ public class FlywheelSubsystem extends SubsystemBase {
     fwMaxTorque = Preferences.getDouble(Constants.maxTorqueKey, Constants.torqueDefaultValue);
     useTorqueCurrentFOC = Preferences.getBoolean("Use TorqueCurrentFOC", true);
   }
+
+  public double getVelocity() {
+    return flywheelVelocity;
+  }
+  public double getTorqueCurrent() {
+    return flywheelTorqueCurrent;
+  }
+
   public boolean exampleCondition() {
     // Query some boolean state, such as a digital sensor.
     return false;
@@ -119,6 +130,13 @@ public class FlywheelSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    var torqueCurrentSignal = flywheel.getTorqueCurrent();
+    flywheelTorqueCurrent = Math.abs(torqueCurrentSignal.getValueAsDouble());
+    var velocitySignal = flywheel.getVelocity();
+    flywheelVelocity = Math.abs(velocitySignal.getValueAsDouble());
+     SmartDashboard.putNumber("Flywheel Torque Current", flywheelTorqueCurrent);
+    SmartDashboard.putNumber("Flywheel Velocity", flywheelVelocity);
+    if (SmartDashboard.getBoolean("Flywheel Config Refresh", false) == true) {setConfiguration();}
   }
 
   @Override

@@ -123,6 +123,12 @@ public class LedSubsystem extends SubsystemBase {
     setFlashing(false,true);
   }
 
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+    if (SmartDashboard.getNumber("LightShow Current Color", 0) != currentColor) {setColor((int)Math.round(SmartDashboard.getNumber("LightShow Current Color", currentColor)));}
+  }
+
   public void pushDashboardValues() {
     SmartDashboard.putNumber("LightShow Current Color",currentColor);
     SmartDashboard.putBoolean("LightShow Flashing", (mode == FLASHING_MODE));
