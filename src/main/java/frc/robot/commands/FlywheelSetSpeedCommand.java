@@ -47,6 +47,7 @@ public class FlywheelSetSpeedCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+  flywheel = new TalonFX(Preferences.getInt(Constants.flywheelIdKey, Constants.flywheelIdDefaultValue));
   m_subsystem.loadPreferences();
   if (m_subsystem.fwDeadband != Preferences.getDouble(Constants.flywheelDeadbandKey, Constants.flywheelDeadbandDefaultValue) 
   || m_subsystem.fwMaxTorque != Preferences.getDouble(Constants.maxTorqueKey, Constants.torqueDefaultValue)) {
@@ -59,7 +60,6 @@ public class FlywheelSetSpeedCommand extends Command {
   @Override
   public void execute() {
   m_subsystem.setSpeed(speed.getAsDouble(),torque.getAsDouble());
-  flywheel = new TalonFX(25);
       // var torqueCurrentSignal = flywheel.getTorqueCurrent();
       // flywheelTorqueCurrent = Math.abs(torqueCurrentSignal.getValueAsDouble());
       // var velocitySignal = flywheel.getVelocity();

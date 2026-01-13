@@ -21,6 +21,8 @@ public final class Constants {
   public static final double endgameWarning = 5;
   public static final String ledDefaultPatternKey = "LEDDefaultPattern";
   public static final int ledPatternDefaultValue = 0;
+  public static final String flywheelIdKey = "Flywheel ID";
+  public static final int flywheelIdDefaultValue = 25;
   public static final String flywheelDeadbandKey = "FOCFlywheelDeadband";
   public static final double flywheelDeadbandDefaultValue = 0.05;
   public static final String maxTorqueKey = "MaxFOCTorque";

@@ -44,7 +44,8 @@ public class FlywheelSubsystem extends SubsystemBase {
     Preferences.initDouble(Constants.flywheelDeadbandKey, 0.05);
     Preferences.initDouble(Constants.maxTorqueKey, 20);
     Preferences.initBoolean("Use TorqueCurrentFOC", true);
-    flywheel = new TalonFX(25);
+    Preferences.initInt(Constants.flywheelIdKey, Constants.flywheelIdDefaultValue);
+    flywheel = new TalonFX(Preferences.getInt(Constants.flywheelIdKey, Constants.flywheelIdDefaultValue));
     setConfiguration();
     loadPreferences();
   }
@@ -107,6 +108,7 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     flywheel.getConfigurator().apply(talonFXConfig);
     SmartDashboard.putBoolean("Flywheel Config Refresh", false);
+    SmartDashboard.putBoolean("Flyheel Pro Licensed", flywheel.getIsProLicensed(false).getValue());
   }
 
   public void loadPreferences() {
@@ -137,6 +139,7 @@ public class FlywheelSubsystem extends SubsystemBase {
      SmartDashboard.putNumber("Flywheel Torque Current", flywheelTorqueCurrent);
     SmartDashboard.putNumber("Flywheel Velocity", flywheelVelocity);
     if (SmartDashboard.getBoolean("Flywheel Config Refresh", false) == true) {setConfiguration();}
+    if (Preferences.getInt(Constants.flywheelIdKey, Constants.flywheelIdDefaultValue) != flywheel.getDeviceID()) {flywheel = new TalonFX(Preferences.getInt(Constants.flywheelIdKey, Constants.flywheelIdDefaultValue));} 
   }
 
   @Override
