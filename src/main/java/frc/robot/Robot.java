@@ -4,8 +4,11 @@
 
 package frc.robot;
 
+import java.util.Optional;
+
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -54,6 +57,8 @@ public class Robot extends TimedRobot {
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     double matchTime = DriverStation.getMatchTime();
     System.out.println(matchTime);
+    m_robotContainer.hubActive = false;
+    m_robotContainer.hubTimer = 0.0;
     // if (matchTime > -1) {
     // SmartDashboard.putNumber("Match Time", matchTime);
     // }
@@ -71,6 +76,9 @@ public class Robot extends TimedRobot {
       else {
         SmartDashboard.putNumber("Match Time", Constants.disabledSeconds);
      }
+     SmartDashboard.putNumber("Shift Time", DriverStation.getMatchTime() + 1);
+    m_robotContainer.hubActive = false;
+    SmartDashboard.putBoolean("Alliance Hub Active", m_robotContainer.hubActive);
   }
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
@@ -87,6 +95,9 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime() + 1);
+    SmartDashboard.putNumber("Shift Time", DriverStation.getMatchTime() + 1);
+    m_robotContainer.hubActive = true;
+    SmartDashboard.putBoolean("Alliance Hub Active", m_robotContainer.hubActive);
   }
 
   @Override
@@ -105,6 +116,80 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     double matchTime = DriverStation.getMatchTime();
     SmartDashboard.putNumber("Match Time", matchTime + 1);
+    if(DriverStation.getGameSpecificMessage().length() > 0)
+{
+  int shiftIndex = -1;
+  double shiftTime = matchTime;
+  if (matchTime > Constants.ShiftEndConstants.transitionShift) {
+    shiftIndex = 0;
+    shiftTime = matchTime - Constants.ShiftEndConstants.transitionShift;
+  }
+  else if (matchTime > Constants.ShiftEndConstants.shift1) {
+    shiftIndex = 1;
+    shiftTime = matchTime - Constants.ShiftEndConstants.shift1;
+  }
+  else if (matchTime > Constants.ShiftEndConstants.shift2) {
+    shiftIndex = 2;
+    shiftTime = matchTime - Constants.ShiftEndConstants.shift2;
+  }
+  else if (matchTime > Constants.ShiftEndConstants.shift3) {
+    shiftIndex = 3;
+    shiftTime = matchTime - Constants.ShiftEndConstants.shift3;
+  }
+  else if (matchTime > Constants.ShiftEndConstants.shift4) {
+    shiftIndex = 4;
+    shiftTime = matchTime - Constants.ShiftEndConstants.shift4;
+  }
+  else if (matchTime > Constants.endgameSeconds) {
+    shiftIndex = 5;
+    shiftTime = matchTime;
+  }
+  SmartDashboard.putNumber("Shift Time", shiftTime + 1);
+
+  m_robotContainer.hubActive = true;
+  Optional<Alliance> ally = DriverStation.getAlliance();
+  switch (DriverStation.getGameSpecificMessage().charAt(0))
+  {
+    case 'B' :
+      //Blue case code
+      if (ally.isPresent()) {
+        if (ally.get() == Alliance.Red) {
+            if (shiftIndex == 2 || shiftIndex == 4) {
+              m_robotContainer.hubActive = false;
+            }
+        }
+        else {
+          if (shiftIndex == 1 || shiftIndex == 3) {
+            m_robotContainer.hubActive = false;
+          }
+        }
+    }
+      break;
+    case 'R' :
+      //Red case code
+      if (ally.isPresent()) {
+        if (ally.get() == Alliance.Red) {
+            if (shiftIndex == 1 || shiftIndex == 3) {
+              m_robotContainer.hubActive = false;
+            }
+        }
+        else {
+          if (shiftIndex == 2 || shiftIndex == 4) {
+            m_robotContainer.hubActive = false;
+          }
+        }
+      }
+      break;
+    default :
+      m_robotContainer.hubActive = true;
+      //This is corrupt data
+      break;
+  }
+} else {
+  //Code for no data received yet
+  m_robotContainer.hubActive = true;
+}
+SmartDashboard.putBoolean("Alliance Hub Active", m_robotContainer.hubActive);
     // if (matchTime <= Constants.endgameSeconds) {
 
     // }

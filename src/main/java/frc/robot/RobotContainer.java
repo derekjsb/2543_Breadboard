@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.pathplanner.lib.auto.AutoBuilder;
+// import com.pathplanner.lib.auto.AutoBuilder;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -45,6 +45,8 @@ public class RobotContainer {
   private final Trigger disableTrigger = new Trigger(DriverStation::isDisabled);
   private final Trigger preEndgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds + Constants.endgameWarning));
   private final Trigger endgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds));
+  public boolean hubActive = true;
+  public double hubTimer = 0.0;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   // private final CommandXboxController m_driverController =
