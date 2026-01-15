@@ -43,13 +43,13 @@ public class RobotContainer {
   private final LedSubsystem m_ledSubsystem = new LedSubsystem();
   private final Trigger enableTrigger = new Trigger(DriverStation::isEnabled);
   private final Trigger disableTrigger = new Trigger(DriverStation::isDisabled);
-  private final Trigger preEndgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds + Constants.endgameWarning));
-  private final Trigger endgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds));
+  private final Trigger preEndgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds + Constants.endgameWarning && DriverStation.isTeleopEnabled()));
+  private final Trigger endgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds && DriverStation.isTeleopEnabled()));
   public int shiftIndex =  0;
   public boolean hubActive = true;
   public double hubTimer = 0.0;
-  private final Trigger shiftStartTrigger = new Trigger(() -> (shiftIndex <= 4 && (hubTimer <= 25 && hubTimer > 9) && DriverStation.getMatchTime() > 40));
-  private final Trigger shiftPreEndTrigger = new Trigger(() -> (shiftIndex <= 4 && hubTimer < Constants.shiftEndWarning && DriverStation.getMatchTime() > 40));
+  private final Trigger shiftStartTrigger = new Trigger(() -> (shiftIndex <= 4 && (hubTimer <= 25 && hubTimer > 9) && DriverStation.getMatchTime() > 40 && DriverStation.isTeleopEnabled()));
+  private final Trigger shiftPreEndTrigger = new Trigger(() -> (shiftIndex <= 4 && hubTimer < Constants.shiftEndWarning && DriverStation.getMatchTime() > 40 && DriverStation.isTeleopEnabled()));
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   // private final CommandXboxController m_driverController =

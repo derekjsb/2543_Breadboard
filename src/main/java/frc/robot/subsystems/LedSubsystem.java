@@ -76,11 +76,10 @@ public class LedSubsystem extends SubsystemBase {
       allianceColor = PRE_ENDGAME_COLOR;
       currentColor = PRE_ENDGAME_COLOR;
       if (SmartDashboard.getBoolean("Alliance Hub Active", false) == true) {
+        char nextInactive = SmartDashboard.getString(Constants.nextInactiveKey, "N").charAt(0);
         System.out.println("active");
-        System.out.println(SmartDashboard.getString(Constants.nextInactiveKey, "N"));
-        System.out.println(ally.get());
-        if ((SmartDashboard.getString(Constants.nextInactiveKey, "N") == "B" && ally.get() == Alliance.Red) ||
-        (SmartDashboard.getString(Constants.nextInactiveKey, "N") == "R" && ally.get() == Alliance.Blue)) {
+        if ((nextInactive == 'R' && ally.get() == Alliance.Red) ||
+        (nextInactive == 'B' && ally.get() == Alliance.Blue)) {
           System.out.println("going red");
           allianceColor = SHIFT_INACTIVE_COLOR;
           currentColor = SHIFT_INACTIVE_COLOR;

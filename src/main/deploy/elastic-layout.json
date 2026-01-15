@@ -136,7 +136,7 @@
               "start_angle": -140.0,
               "end_angle": 140.0,
               "min_value": 0.0,
-              "max_value": 120.0,
+              "max_value": 130.0,
               "number_of_labels": 8,
               "wrap_value": false,
               "show_pointer": true,
@@ -275,13 +275,6 @@
       }
     },
     {
-      "name": "Autonomous",
-      "grid_layout": {
-        "layouts": [],
-        "containers": []
-      }
-    },
-    {
       "name": "Alliance Shifts Testing",
       "grid_layout": {
         "layouts": [],
@@ -290,7 +283,7 @@
             "title": "Match Time",
             "x": 384.0,
             "y": 0.0,
-            "width": 128.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "Match Time",
             "properties": {
@@ -331,11 +324,69 @@
               "period": 0.06,
               "data_type": "double",
               "time_display_mode": "Minutes and Seconds",
-              "red_start_time": 2,
+              "red_start_time": 3,
               "yellow_start_time": 5
+            }
+          },
+          {
+            "title": "Next Inactive Alliance",
+            "x": 384.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Next Inactive Alliance",
+              "period": 0.06,
+              "data_type": "string"
+            }
+          },
+          {
+            "title": "LightShow Current Color",
+            "x": 384.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/LightShow Current Color",
+              "period": 0.06,
+              "data_type": "double"
+            }
+          },
+          {
+            "title": "FMSInfo",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "FMSInfo",
+            "properties": {
+              "topic": "/FMSInfo",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "First Inactive Hub (GameData)",
+            "x": 384.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/FMSInfo/GameSpecificMessage",
+              "period": 0.06,
+              "data_type": "string"
             }
           }
         ]
+      }
+    },
+    {
+      "name": "Autonomous",
+      "grid_layout": {
+        "layouts": [],
+        "containers": []
       }
     }
   ]

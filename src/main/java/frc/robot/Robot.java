@@ -121,6 +121,7 @@ public class Robot extends TimedRobot {
 
   double shiftTime = matchTime;
   if (matchTime > Constants.ShiftEndConstants.transitionShift) {
+    
     SmartDashboard.putString(Constants.nextInactiveKey, DriverStation.getGameSpecificMessage());
     m_robotContainer.shiftIndex = 0;
     shiftTime = matchTime - Constants.ShiftEndConstants.transitionShift;
@@ -141,7 +142,7 @@ public class Robot extends TimedRobot {
     m_robotContainer.shiftIndex = 4;
     shiftTime = matchTime - Constants.ShiftEndConstants.shift4;
   }
-  else if (matchTime > Constants.endgameSeconds) {
+  else if (matchTime < Constants.endgameSeconds) {
     m_robotContainer.shiftIndex = 5;
     shiftTime = matchTime;
   }
@@ -154,10 +155,13 @@ public class Robot extends TimedRobot {
     case 'B' :
       //Blue case code
       if (m_robotContainer.shiftIndex == 1 || m_robotContainer.shiftIndex == 3) {
-        SmartDashboard.putString(Constants.nextInactiveKey, "B");
+        SmartDashboard.putString(Constants.nextInactiveKey, "R");
       }
       else if (m_robotContainer.shiftIndex == 2 || m_robotContainer.shiftIndex == 4) {
-        SmartDashboard.putString(Constants.nextInactiveKey, "R");
+        SmartDashboard.putString(Constants.nextInactiveKey, "B");
+      }
+      else if (m_robotContainer.shiftIndex == 5) {
+        SmartDashboard.putString(Constants.nextInactiveKey, "N");
       }
       if (ally.isPresent()) {
         if (ally.get() == Alliance.Red) {
@@ -175,10 +179,13 @@ public class Robot extends TimedRobot {
     case 'R' :
       //Red case code
       if (m_robotContainer.shiftIndex == 1 || m_robotContainer.shiftIndex == 3) {
-        SmartDashboard.putString(Constants.nextInactiveKey, "R");
+        SmartDashboard.putString(Constants.nextInactiveKey, "B");
       }
       else if (m_robotContainer.shiftIndex == 2 || m_robotContainer.shiftIndex == 4) {
-        SmartDashboard.putString(Constants.nextInactiveKey, "B");
+        SmartDashboard.putString(Constants.nextInactiveKey, "R");
+      }
+      else if (m_robotContainer.shiftIndex == 5) {
+        SmartDashboard.putString(Constants.nextInactiveKey, "N");
       }
       if (ally.isPresent()) {
         if (ally.get() == Alliance.Red) {
@@ -200,6 +207,8 @@ public class Robot extends TimedRobot {
   }
 } else {
   //Code for no data received yet
+  SmartDashboard.putNumber("Shift Time", matchTime);
+  SmartDashboard.putString(Constants.nextInactiveKey, "N");
   m_robotContainer.hubActive = true;
 }
 SmartDashboard.putBoolean("Alliance Hub Active", m_robotContainer.hubActive);
