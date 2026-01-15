@@ -45,8 +45,11 @@ public class RobotContainer {
   private final Trigger disableTrigger = new Trigger(DriverStation::isDisabled);
   private final Trigger preEndgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds + Constants.endgameWarning));
   private final Trigger endgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds));
+  public int shiftIndex =  0;
   public boolean hubActive = true;
   public double hubTimer = 0.0;
+  private final Trigger shiftStartTrigger = new Trigger(() -> (shiftIndex <= 4 && (hubTimer <= 25 && hubTimer > 9) && DriverStation.getMatchTime() > 40));
+  private final Trigger shiftPreEndTrigger = new Trigger(() -> (shiftIndex <= 4 && hubTimer < Constants.shiftEndWarning && DriverStation.getMatchTime() > 40));
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   // private final CommandXboxController m_driverController =
@@ -75,8 +78,10 @@ public class RobotContainer {
     m_flywheelSubsystem.setDefaultCommand(new FlywheelSetSpeedCommand(m_flywheelSubsystem, m_ledSubsystem, () -> m_driverController.getY(), () -> m_driverController.getX()));
     enableTrigger.onTrue(new LedEnableCommand(m_ledSubsystem, 1).ignoringDisable(true));
     disableTrigger.whileTrue(new LedEnableCommand(m_ledSubsystem, 0).ignoringDisable(true));
-    preEndgameTrigger.onTrue(new LedEnableCommand(m_ledSubsystem, 2).ignoringDisable(true));
-    endgameTrigger.onTrue(new LedEnableCommand(m_ledSubsystem, 3).ignoringDisable(true));
+    shiftStartTrigger.onTrue(new LedEnableCommand(m_ledSubsystem, 2).ignoringDisable(true));
+    shiftPreEndTrigger.onTrue(new LedEnableCommand(m_ledSubsystem, 3).ignoringDisable(true));
+    preEndgameTrigger.onTrue(new LedEnableCommand(m_ledSubsystem, 3).ignoringDisable(true));
+    endgameTrigger.onTrue(new LedEnableCommand(m_ledSubsystem, 4).ignoringDisable(true));
     new JoystickButton(m_driverController, 9).onTrue(new LedEnableCommand(m_ledSubsystem, 0).ignoringDisable(true));
     new JoystickButton(m_driverController, 10).onTrue(new LedEnableCommand(m_ledSubsystem, 1).ignoringDisable(true));
     new JoystickButton(m_driverController, 1).onTrue(new LedColorCommand(m_ledSubsystem,1, 2,false));

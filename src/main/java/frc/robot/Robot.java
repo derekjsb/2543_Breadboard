@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
+  private double noFmsConstant;
 
   private final RobotContainer m_robotContainer;
 
@@ -57,18 +58,14 @@ public class Robot extends TimedRobot {
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     double matchTime = DriverStation.getMatchTime();
     System.out.println(matchTime);
+    m_robotContainer.shiftIndex = 0;
     m_robotContainer.hubActive = false;
     m_robotContainer.hubTimer = 0.0;
-    // if (matchTime > -1) {
-    // SmartDashboard.putNumber("Match Time", matchTime);
-    // }
-    // else {
-    //   SmartDashboard.putNumber("Match Time", Constants.disabledSeconds);
-    // }
   }
 
   @Override
   public void disabledPeriodic() {
+    if (DriverStation.isFMSAttached()) {noFmsConstant = 0;} else {noFmsConstant = 1;}
     double matchTime = DriverStation.getMatchTime();
     if (matchTime > -1) {
       SmartDashboard.putNumber("Match Time", matchTime);
@@ -76,7 +73,7 @@ public class Robot extends TimedRobot {
       else {
         SmartDashboard.putNumber("Match Time", Constants.disabledSeconds);
      }
-     SmartDashboard.putNumber("Shift Time", DriverStation.getMatchTime() + 1);
+     SmartDashboard.putNumber("Shift Time", DriverStation.getMatchTime() + noFmsConstant);
     m_robotContainer.hubActive = false;
     SmartDashboard.putBoolean("Alliance Hub Active", m_robotContainer.hubActive);
   }
@@ -84,7 +81,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
+    SmartDashboard.putString(Constants.nextInactiveKey, "N");
+    if (DriverStation.isFMSAttached()) {noFmsConstant = 0;}
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
@@ -94,8 +92,8 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime() + 1);
-    SmartDashboard.putNumber("Shift Time", DriverStation.getMatchTime() + 1);
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime() + noFmsConstant);
+    SmartDashboard.putNumber("Shift Time", DriverStation.getMatchTime() + noFmsConstant);
     m_robotContainer.hubActive = true;
     SmartDashboard.putBoolean("Alliance Hub Active", m_robotContainer.hubActive);
   }
@@ -106,6 +104,8 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
+    if (DriverStation.isFMSAttached()) {noFmsConstant = 0;}
+    SmartDashboard.putString(Constants.nextInactiveKey, "N");
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
@@ -115,51 +115,58 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     double matchTime = DriverStation.getMatchTime();
-    SmartDashboard.putNumber("Match Time", matchTime + 1);
+    SmartDashboard.putNumber("Match Time", matchTime + noFmsConstant);
     if(DriverStation.getGameSpecificMessage().length() > 0)
 {
-  int shiftIndex = -1;
+
   double shiftTime = matchTime;
   if (matchTime > Constants.ShiftEndConstants.transitionShift) {
-    shiftIndex = 0;
+    SmartDashboard.putString(Constants.nextInactiveKey, DriverStation.getGameSpecificMessage());
+    m_robotContainer.shiftIndex = 0;
     shiftTime = matchTime - Constants.ShiftEndConstants.transitionShift;
   }
   else if (matchTime > Constants.ShiftEndConstants.shift1) {
-    shiftIndex = 1;
+    m_robotContainer.shiftIndex = 1;
     shiftTime = matchTime - Constants.ShiftEndConstants.shift1;
   }
   else if (matchTime > Constants.ShiftEndConstants.shift2) {
-    shiftIndex = 2;
+    m_robotContainer.shiftIndex = 2;
     shiftTime = matchTime - Constants.ShiftEndConstants.shift2;
   }
   else if (matchTime > Constants.ShiftEndConstants.shift3) {
-    shiftIndex = 3;
+    m_robotContainer.shiftIndex = 3;
     shiftTime = matchTime - Constants.ShiftEndConstants.shift3;
   }
   else if (matchTime > Constants.ShiftEndConstants.shift4) {
-    shiftIndex = 4;
+    m_robotContainer.shiftIndex = 4;
     shiftTime = matchTime - Constants.ShiftEndConstants.shift4;
   }
   else if (matchTime > Constants.endgameSeconds) {
-    shiftIndex = 5;
+    m_robotContainer.shiftIndex = 5;
     shiftTime = matchTime;
   }
-  SmartDashboard.putNumber("Shift Time", shiftTime + 1);
-
+  SmartDashboard.putNumber("Shift Time", shiftTime + noFmsConstant);
+  m_robotContainer.hubTimer = shiftTime;
   m_robotContainer.hubActive = true;
   Optional<Alliance> ally = DriverStation.getAlliance();
   switch (DriverStation.getGameSpecificMessage().charAt(0))
   {
     case 'B' :
       //Blue case code
+      if (m_robotContainer.shiftIndex == 1 || m_robotContainer.shiftIndex == 3) {
+        SmartDashboard.putString(Constants.nextInactiveKey, "B");
+      }
+      else if (m_robotContainer.shiftIndex == 2 || m_robotContainer.shiftIndex == 4) {
+        SmartDashboard.putString(Constants.nextInactiveKey, "R");
+      }
       if (ally.isPresent()) {
         if (ally.get() == Alliance.Red) {
-            if (shiftIndex == 2 || shiftIndex == 4) {
+            if (m_robotContainer.shiftIndex == 2 || m_robotContainer.shiftIndex == 4) {
               m_robotContainer.hubActive = false;
             }
         }
         else {
-          if (shiftIndex == 1 || shiftIndex == 3) {
+          if (m_robotContainer.shiftIndex == 1 || m_robotContainer.shiftIndex == 3) {
             m_robotContainer.hubActive = false;
           }
         }
@@ -167,14 +174,20 @@ public class Robot extends TimedRobot {
       break;
     case 'R' :
       //Red case code
+      if (m_robotContainer.shiftIndex == 1 || m_robotContainer.shiftIndex == 3) {
+        SmartDashboard.putString(Constants.nextInactiveKey, "R");
+      }
+      else if (m_robotContainer.shiftIndex == 2 || m_robotContainer.shiftIndex == 4) {
+        SmartDashboard.putString(Constants.nextInactiveKey, "B");
+      }
       if (ally.isPresent()) {
         if (ally.get() == Alliance.Red) {
-            if (shiftIndex == 1 || shiftIndex == 3) {
+            if (m_robotContainer.shiftIndex == 1 || m_robotContainer.shiftIndex == 3) {
               m_robotContainer.hubActive = false;
             }
         }
         else {
-          if (shiftIndex == 2 || shiftIndex == 4) {
+          if (m_robotContainer.shiftIndex == 2 || m_robotContainer.shiftIndex == 4) {
             m_robotContainer.hubActive = false;
           }
         }

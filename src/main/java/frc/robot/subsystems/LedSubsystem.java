@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.Constants;
 import frc.robot.util.Elastic;
 
@@ -26,6 +27,8 @@ public class LedSubsystem extends SubsystemBase {
   private static final int SOLID_MODE = 0;
   private static final int FLASHING_MODE = 10;
   private static final int PRE_ENDGAME_COLOR = 17;
+  private static final int SHIFT_ACTIVE_COLOR = 21;
+  private static final int SHIFT_INACTIVE_COLOR = 11;
   private static final int ENDGAME_COLOR = 24;
 
   // color constants
@@ -64,10 +67,29 @@ public class LedSubsystem extends SubsystemBase {
       currentColor = allianceColor;
     }
     if (endgame == 2) {
-      allianceColor = PRE_ENDGAME_COLOR;
-      currentColor = PRE_ENDGAME_COLOR;
+      if (SmartDashboard.getBoolean("Alliance Hub Active", false) == true && SmartDashboard.getNumber("Match Time", 0) > 0) {
+      allianceColor = SHIFT_ACTIVE_COLOR;
+      currentColor = SHIFT_ACTIVE_COLOR;
+      }
     }
     else if (endgame == 3) {
+      allianceColor = PRE_ENDGAME_COLOR;
+      currentColor = PRE_ENDGAME_COLOR;
+      if (SmartDashboard.getBoolean("Alliance Hub Active", false) == true) {
+        System.out.println("active");
+        System.out.println(SmartDashboard.getString(Constants.nextInactiveKey, "N"));
+        System.out.println(ally.get());
+        if ((SmartDashboard.getString(Constants.nextInactiveKey, "N") == "B" && ally.get() == Alliance.Red) ||
+        (SmartDashboard.getString(Constants.nextInactiveKey, "N") == "R" && ally.get() == Alliance.Blue)) {
+          System.out.println("going red");
+          allianceColor = SHIFT_INACTIVE_COLOR;
+          currentColor = SHIFT_INACTIVE_COLOR;
+          Elastic.Notification dashboardNotification = new Elastic.Notification(Elastic.NotificationLevel.WARNING, "Shift Ending Soon", "Your Alliance Shift is ending soon.");
+          Elastic.sendNotification(dashboardNotification);
+        }
+      }
+    }
+    else if (endgame == 4) {
       allianceColor = ENDGAME_COLOR;
       currentColor = ENDGAME_COLOR;
     }
@@ -132,8 +154,8 @@ public class LedSubsystem extends SubsystemBase {
   public void pushDashboardValues() {
     SmartDashboard.putNumber("LightShow Current Color",currentColor);
     SmartDashboard.putBoolean("LightShow Flashing", (mode == FLASHING_MODE));
-    Elastic.Notification dashboardNotification = new Elastic.Notification(Elastic.NotificationLevel.INFO, "Dashboard Values Updated", "LED Dashboard values have been updated.");
-    Elastic.sendNotification(dashboardNotification);
+    // Elastic.Notification dashboardNotification = new Elastic.Notification(Elastic.NotificationLevel.INFO, "Dashboard Values Updated", "LED Dashboard values have been updated.");
+    // Elastic.sendNotification(dashboardNotification);
   }
 
 }

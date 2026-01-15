@@ -16,6 +16,11 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+  public static final double disabledSeconds = 140;
+  public static final double endgameSeconds = 30;
+  public static final double endgameWarning = 5;
+  public static final double shiftEndWarning = 3;
+  public static final String nextInactiveKey = "Next Inactive Alliance";
   public static class ShiftEndConstants {
     public static final double transitionShift = 130;
     public static final double shift1 = 105;
@@ -23,9 +28,6 @@ public final class Constants {
     public static final double shift3 = 55;
     public static final double shift4 = 30;
   }
-  public static final double disabledSeconds = 140;
-  public static final double endgameSeconds = 30;
-  public static final double endgameWarning = 5;
   public static final String ledDefaultPatternKey = "LEDDefaultPattern";
   public static final int ledPatternDefaultValue = 0;
   public static final String flywheelIdKey = "Flywheel ID";
