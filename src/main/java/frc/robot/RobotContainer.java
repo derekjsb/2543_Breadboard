@@ -26,8 +26,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 // import java.util.prefs.Preferences;
 
-import com.ctre.phoenix6.configs.TalonFXConfigurator;
-import com.ctre.phoenix6.hardware.TalonFX;
 // import com.pathplanner.lib.auto.AutoBuilder;
 
 /**
@@ -43,8 +41,8 @@ public class RobotContainer {
   private final LedSubsystem m_ledSubsystem = new LedSubsystem();
   private final Trigger enableTrigger = new Trigger(DriverStation::isEnabled);
   private final Trigger disableTrigger = new Trigger(DriverStation::isDisabled);
-  private final Trigger preEndgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds + Constants.endgameWarning && DriverStation.isTeleopEnabled()));
-  private final Trigger endgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds && DriverStation.isTeleopEnabled()));
+  private final Trigger preEndgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds + Constants.endgameWarning && DriverStation.getMatchTime() > 1));
+  private final Trigger endgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds && DriverStation.getMatchTime() > 1));
   public int shiftIndex =  0;
   public boolean hubActive = true;
   public double hubTimer = 0.0;
@@ -93,7 +91,6 @@ public class RobotContainer {
     new JoystickButton(m_driverController, 7).onTrue(new LedColorCommand(m_ledSubsystem,3, 6,false));
     new JoystickButton(m_driverController, 8).onTrue(new LedColorCommand(m_ledSubsystem,3, 6,true));
 
-    Preferences.remove("Auto");
     SmartDashboard.putBoolean("Auto",false);
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.

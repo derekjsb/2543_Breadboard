@@ -36,4 +36,9 @@ public final class Constants {
   public static final double flywheelDeadbandDefaultValue = 0.05;
   public static final String maxTorqueKey = "MaxFOCTorque";
   public static final double torqueDefaultValue = 20.0;
+  public static class DutyCycleMultipliers {
+    public static final double falcon500 = 119;
+    public static final double krakenx60 = 110;
+    public static final double krakenx44 = 125;
+  }
 }
