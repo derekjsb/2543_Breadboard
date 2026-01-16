@@ -55,6 +55,16 @@ public class FlywheelSetSpeedCommand extends Command {
     m_subsystem.fwMaxTorque = Preferences.getDouble(Constants.maxTorqueKey, Constants.torqueDefaultValue);
     System.out.println("initialized preference values");
   }
+  switch (m_subsystem.getMotorType()) {
+    case "Falcon 500":
+      dcMultiplier = Constants.DutyCycleMultipliers.falcon500;
+    case "Kraken X60":
+      dcMultiplier = Constants.DutyCycleMultipliers.krakenx60;
+    case "Kraken X44":
+      dcMultiplier = Constants.DutyCycleMultipliers.krakenx44;
+    default: 
+    break;
+  }
   }
   // Called every time the scheduler runs while the command is scheduled.
   @Override

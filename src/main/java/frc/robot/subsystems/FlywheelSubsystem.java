@@ -19,12 +19,10 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.LedSubsystem;
-import frc.robot.commands.LedColorCommand;
 
 public class FlywheelSubsystem extends SubsystemBase {
   private TalonFX flywheel;
@@ -32,12 +30,10 @@ public class FlywheelSubsystem extends SubsystemBase {
   private double torqueOutput;
   public double fwDeadband;
   public double fwMaxTorque;
-  private double flywheelSpeed;
   private double flywheelTorqueCurrent;
   private double flywheelVelocity;
-  private LedSubsystem ledSub;
-  private int ledDebounce;
   private boolean useTorqueCurrentFOC;
+  private final SendableChooser<String> motorChooser = new SendableChooser<>();
 
   /** Creates a new ExampleSubsystem. */
   public FlywheelSubsystem() {
@@ -45,6 +41,11 @@ public class FlywheelSubsystem extends SubsystemBase {
     Preferences.initDouble(Constants.maxTorqueKey, 20);
     Preferences.initBoolean("Use TorqueCurrentFOC", true);
     Preferences.initInt(Constants.flywheelIdKey, Constants.flywheelIdDefaultValue);
+    Preferences.initString("Motor Default", "Kraken X44");
+    motorChooser.addOption("Falcon 500", "Falcon 500");
+    motorChooser.addOption("Kraken X60", "Kraken X60");
+    motorChooser.addOption("Kraken X44", "Kraken X44");
+    motorChooser.setDefaultOption(Preferences.getString("Motor Default", "Kraken X44"), Preferences.getString("Motor Default", "Kraken X44"));
     flywheel = new TalonFX(Preferences.getInt(Constants.flywheelIdKey, Constants.flywheelIdDefaultValue));
     setConfiguration();
     loadPreferences();
@@ -107,6 +108,7 @@ public class FlywheelSubsystem extends SubsystemBase {
       .withCurrentLimits(currentLimitConfig);
 
     flywheel.getConfigurator().apply(talonFXConfig);
+    
     SmartDashboard.putBoolean("Flywheel Config Refresh", false);
     SmartDashboard.putBoolean("Flyheel Pro Licensed", flywheel.getIsProLicensed(false).getValue());
   }
@@ -115,6 +117,11 @@ public class FlywheelSubsystem extends SubsystemBase {
     fwDeadband = Preferences.getDouble(Constants.flywheelDeadbandKey, Constants.flywheelDeadbandDefaultValue);
     fwMaxTorque = Preferences.getDouble(Constants.maxTorqueKey, Constants.torqueDefaultValue);
     useTorqueCurrentFOC = Preferences.getBoolean("Use TorqueCurrentFOC", true);
+  }
+
+  public String getMotorType() {
+    Preferences.setString("Motor Default", motorChooser.getSelected());
+    return motorChooser.getSelected();
   }
 
   public double getVelocity() {
