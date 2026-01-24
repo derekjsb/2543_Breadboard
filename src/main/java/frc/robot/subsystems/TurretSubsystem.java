@@ -8,46 +8,53 @@ import frc.robot.Constants;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DriverStation;
 
-public class FlywheelSubsystem extends SubsystemBase {
-  private TalonFX flywheel;
+public class TurretSubsystem extends SubsystemBase {
+  private TalonFX turret;
   private TorqueCurrentFOC torquecurrent;
   private double torqueOutput;
   public double fwDeadband;
   public double fwMaxTorque;
-  private double flywheelTorqueCurrent;
-  private double flywheelVelocity;
+  private double turretTorqueCurrent;
+  private double turretVelocity;
   private boolean useTorqueCurrentFOC;
   private final SendableChooser<String> motorChooser = new SendableChooser<>();
 
   /** Creates a new ExampleSubsystem. */
-  public FlywheelSubsystem() {
+  public TurretSubsystem() {
     Preferences.initDouble(Constants.flywheelDeadbandKey, 0.05);
     Preferences.initDouble(Constants.maxTorqueKey, 20);
     Preferences.initBoolean("Use TorqueCurrentFOC", true);
-    Preferences.initInt(Constants.flywheelIdKey, Constants.flywheelIdDefaultValue);
+    Preferences.initInt(Constants.turretIdKey, Constants.turretIdDefaultValue);
     Preferences.initString("Motor Default", "Kraken X44");
-    motorChooser.addOption("Falcon 500", "Falcon 500");
-    motorChooser.addOption("Kraken X60", "Kraken X60");
-    motorChooser.addOption("Kraken X44", "Kraken X44");
-    motorChooser.setDefaultOption(Preferences.getString("Motor Default", "Kraken X44"), Preferences.getString("Motor Default", "Kraken X44"));
-    SmartDashboard.putData(motorChooser);
-    flywheel = new TalonFX(Preferences.getInt(Constants.flywheelIdKey, Constants.flywheelIdDefaultValue));
+    // motorChooser.addOption("Falcon 500", "Falcon 500");
+    // motorChooser.addOption("Kraken X60", "Kraken X60");
+    // motorChooser.addOption("Kraken X44", "Kraken X44");
+    // motorChooser.setDefaultOption(Preferences.getString("Motor Default", "Kraken X44"), Preferences.getString("Motor Default", "Kraken X44"));
+    // SmartDashboard.putData(motorChooser);
+    turret = new TalonFX(Preferences.getInt(Constants.turretIdKey, Constants.turretIdDefaultValue));
     setConfiguration();
     loadPreferences();
   }
@@ -72,15 +79,31 @@ public class FlywheelSubsystem extends SubsystemBase {
     // torque current
     if (useTorqueCurrentFOC) {
     torquecurrent = new TorqueCurrentFOC(torqueOutput);
-    flywheel.setControl(torquecurrent
+    turret.setControl(torquecurrent
     .withMaxAbsDutyCycle(Math.abs(speed)));
     }
     // duty cycle
     else {
-    flywheel.setControl(new DutyCycleOut(-speed).withEnableFOC((torque > 0)));
+    turret.setControl(new DutyCycleOut(-speed).withEnableFOC((torque > 0)));
     }
 
     // System.out.println(speed);
+  }
+
+  private double wrapAround(double value, double min, double max) {
+    double range = max - min + 1; // Calculate the size of the range
+    // The formula ensures the result is always positive and within the range
+    return ((((value - min) % range) + range) % range) + min;
+}
+  public void setPosition(double pos) {
+    turret.setControl(new PositionDutyCycle(wrapAround(pos, 0, 1)).withSlot(0));
+  }
+
+  public void resetPosition(double pos) {
+    turret.setPosition(0);
+    if (DriverStation.isDisabled()) {
+    setConfiguration();
+    }
   }
   public void setConfiguration() {
    var currentLimitConfig = new CurrentLimitsConfigs()
@@ -97,21 +120,26 @@ public class FlywheelSubsystem extends SubsystemBase {
       .withGravityType(GravityTypeValue.Elevator_Static)
       .withKA(0)
       .withKG(0.0)
-      .withKP(0.0)
+      .withKP(2)
       .withKI(0.0)
       .withKS(0.0)
       .withKV(0.0)
       .withKD(0.0);
 
+    var feedbackConfigs = new FeedbackConfigs()
+      .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor)
+      .withSensorToMechanismRatio(11.1);
+
     var talonFXConfig = new TalonFXConfiguration()
       .withMotorOutput(motorOutputConfig)
       .withSlot0(slot0Config)
+      .withFeedback(feedbackConfigs)
       .withCurrentLimits(currentLimitConfig);
 
-    flywheel.getConfigurator().apply(talonFXConfig);
+    turret.getConfigurator().apply(talonFXConfig);
     
     SmartDashboard.putBoolean("Flywheel Config Refresh", false);
-    SmartDashboard.putBoolean("Flyheel Pro Licensed", flywheel.getIsProLicensed(false).getValue());
+    SmartDashboard.putBoolean("Flyheel Pro Licensed", turret.getIsProLicensed(false).getValue());
   }
 
   public void loadPreferences() {
@@ -127,10 +155,10 @@ public class FlywheelSubsystem extends SubsystemBase {
   }
 
   public double getVelocity() {
-    return flywheelVelocity;
+    return turretVelocity;
   }
   public double getTorqueCurrent() {
-    return flywheelTorqueCurrent;
+    return turretTorqueCurrent;
   }
 
   public boolean exampleCondition() {
@@ -141,14 +169,14 @@ public class FlywheelSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    var torqueCurrentSignal = flywheel.getTorqueCurrent();
-    flywheelTorqueCurrent = Math.abs(torqueCurrentSignal.getValueAsDouble());
-    var velocitySignal = flywheel.getVelocity();
-    flywheelVelocity = Math.abs(velocitySignal.getValueAsDouble());
-     SmartDashboard.putNumber("Flywheel Torque Current", flywheelTorqueCurrent);
-    SmartDashboard.putNumber("Flywheel Velocity", flywheelVelocity);
-    if (SmartDashboard.getBoolean("Flywheel Config Refresh", false) == true) {setConfiguration();}
-    if (Preferences.getInt(Constants.flywheelIdKey, Constants.flywheelIdDefaultValue) != flywheel.getDeviceID()) {flywheel = new TalonFX(Preferences.getInt(Constants.flywheelIdKey, Constants.flywheelIdDefaultValue));} 
+    var torqueCurrentSignal = turret.getTorqueCurrent();
+    turretTorqueCurrent = Math.abs(torqueCurrentSignal.getValueAsDouble());
+    var velocitySignal = turret.getVelocity();
+    turretVelocity = Math.abs(velocitySignal.getValueAsDouble());
+    //  SmartDashboard.putNumber("Flywheel Torque Current", turretTorqueCurrent);
+    // SmartDashboard.putNumber("Flywheel Velocity", turretVelocity);
+    // if (SmartDashboard.getBoolean("Flywheel Config Refresh", false) == true) {setConfiguration();}
+    if (Preferences.getInt(Constants.turretIdKey, Constants.turretIdDefaultValue) != turret.getDeviceID()) {turret = new TalonFX(Preferences.getInt(Constants.turretIdKey, Constants.turretIdDefaultValue));} 
   }
 
   @Override

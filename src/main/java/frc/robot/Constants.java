@@ -34,6 +34,8 @@ public final class Constants {
   public static final int flywheelIdDefaultValue = 25;
   public static final String flywheelDeadbandKey = "FOCFlywheelDeadband";
   public static final double flywheelDeadbandDefaultValue = 0.05;
+  public static final String turretIdKey = "Turret ID";
+  public static final int turretIdDefaultValue = 25;
   public static final String maxTorqueKey = "MaxFOCTorque";
   public static final double torqueDefaultValue = 20.0;
   public static class DutyCycleMultipliers {

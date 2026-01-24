@@ -13,8 +13,11 @@ import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.commands.FlywheelSetSpeedCommand;
 import frc.robot.commands.LedColorCommand;
 import frc.robot.commands.LedEnableCommand;
+import frc.robot.commands.TurretResetCommand;
 import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.subsystems.LedSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
@@ -39,15 +42,18 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final FlywheelSubsystem m_flywheelSubsystem = new FlywheelSubsystem();
   private final LedSubsystem m_ledSubsystem = new LedSubsystem();
+  private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
   private final Trigger enableTrigger = new Trigger(DriverStation::isEnabled);
   private final Trigger disableTrigger = new Trigger(DriverStation::isDisabled);
-  private final Trigger preEndgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds + Constants.endgameWarning && DriverStation.getMatchTime() > 1));
-  private final Trigger endgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds && DriverStation.getMatchTime() > 1));
+  private final Trigger preEndgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds + Constants.endgameWarning && DriverStation.getMatchTime() > 1 && DriverStation.isTeleopEnabled()));
+  private final Trigger endgameTrigger = new Trigger(() -> (DriverStation.getMatchTime() <= Constants.endgameSeconds && DriverStation.getMatchTime() > 1 && DriverStation.isTeleopEnabled()));
   public int shiftIndex =  0;
   public boolean hubActive = true;
   public double hubTimer = 0.0;
   private final Trigger shiftStartTrigger = new Trigger(() -> (shiftIndex <= 4 && (hubTimer <= 25 && hubTimer > 9) && DriverStation.getMatchTime() > 40 && DriverStation.isTeleopEnabled()));
   private final Trigger shiftPreEndTrigger = new Trigger(() -> (shiftIndex <= 4 && hubTimer < Constants.shiftEndWarning && DriverStation.getMatchTime() > 40 && DriverStation.isTeleopEnabled()));
+  DigitalInput m_limitSwitch = new DigitalInput(0);
+  private final Trigger turretResetTrigger = new Trigger(() -> (!m_limitSwitch.get()));
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   // private final CommandXboxController m_driverController =
@@ -90,6 +96,8 @@ public class RobotContainer {
     new JoystickButton(m_driverController, 6).onTrue(new LedColorCommand(m_ledSubsystem,2, 6,true));
     new JoystickButton(m_driverController, 7).onTrue(new LedColorCommand(m_ledSubsystem,3, 6,false));
     new JoystickButton(m_driverController, 8).onTrue(new LedColorCommand(m_ledSubsystem,3, 6,true));
+
+    turretResetTrigger.onTrue(new TurretResetCommand(m_turretSubsystem).ignoringDisable(true));
 
     SmartDashboard.putBoolean("Auto",false);
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
